@@ -1,0 +1,58 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor GuestUser
+actor HotelOwner
+actor Admin
+actor SearchEngine
+actor RecommendationSystem
+
+rectangle "Hotel Web Platform" {
+
+    ' ========== GUEST USER ==========
+    GuestUser --> (Register)
+    GuestUser --> (Login)
+    GuestUser --> (Search Hotels)
+    GuestUser --> (View Hotel Details)
+    GuestUser --> (Get Recommendations)
+    GuestUser --> (Visit Hotel Website)
+    GuestUser --> (Save Favorite Hotels)
+    GuestUser --> (Leave Review)
+    GuestUser --> (Book Room)
+    GuestUser --> (Make Payment)
+
+    (Search Hotels) --> SearchEngine
+    (Get Recommendations) --> RecommendationSystem
+    (Get Recommendations) ..> (Track User Behavior) : <<include>>
+    (Book Room) ..> (Check Availability) : <<include>>
+    (Make Payment) ..> (Book Room) : <<extend>>
+
+    ' ========== HOTEL OWNER ==========
+    HotelOwner --> (Register as Owner)
+    HotelOwner --> (Login)
+    HotelOwner --> (Create Hotel Profile)
+    HotelOwner --> (Edit Hotel Info)
+    HotelOwner --> (Create Website)
+    HotelOwner --> (Choose Template)
+    HotelOwner --> (Customize Website)
+    HotelOwner --> (Publish Website)
+    HotelOwner --> (Unpublish Website)
+    HotelOwner --> (Add Rooms)
+    HotelOwner --> (Edit Room Info)
+    HotelOwner --> (View Bookings)
+    HotelOwner --> (Manage Payments)
+    HotelOwner --> (View Website Analytics)
+    HotelOwner --> (Respond to Reviews)
+
+    (Create Website) ..> (Choose Template)
+    (Customize Website) ..> (Edit Hotel Info) : <<include>>
+
+    ' ========== ADMIN ==========
+    Admin --> (Manage Templates)
+    Admin --> (Moderate Reviews)
+    Admin --> (View System Analytics)
+}
+
+@enduml
+

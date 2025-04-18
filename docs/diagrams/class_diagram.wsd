@@ -1,0 +1,164 @@
+@startuml
+
+' === USERS & ROLES ===
+class User {
+    +userId: int
+    +username: string
+    +email: string
+    +password: string
+    +isHotelOwner: bool
+    +createdAt: datetime
+}
+
+class HotelOwner {
+    +ownerId: int
+    +userId: int
+    +businessName: string
+    +contactNumber: string
+}
+
+class GuestUser {
+    +guestId: int
+    +userId: int
+}
+
+User <|-- HotelOwner
+User <|-- GuestUser
+
+' === HOTEL & WEBSITE ===
+class Hotel {
+    +hotelId: int
+    +ownerId: int
+    +name: string
+    +location: string
+    +description: string
+    +rating: float
+    +amenities: List<string>
+}
+
+HotelOwner "1" -- "1..*" Hotel
+
+class Website {
+    +websiteId: int
+    +hotelId: int
+    +templateId: int
+    +customDomain: string
+    +isPublished: bool
+    +createdAt: datetime
+}
+
+Hotel "1" -- "1..*" Website
+
+class Template {
+    +templateId: int
+    +name: string
+    +description: string
+    +defaultTheme: string
+}
+
+Template "1" -- "0..*" Website
+
+class Page {
+    +pageId: int
+    +websiteId: int
+    +pageTitle: string
+    +content: string
+    +pageType: string
+}
+
+Website "1" -- "1..*" Page
+
+class Customization {
+    +customizationId: int
+    +websiteId: int
+    +theme: string
+    +logoUrl: string
+    +layoutSettings: JSON
+}
+
+Website "1" -- "1" Customization
+
+class Analytics {
+    +analyticsId: int
+    +websiteId: int
+    +dailyVisits: int
+    +monthlyBookings: int
+    +conversionRate: float
+}
+
+Website "1" -- "1" Analytics
+
+' === HOTEL MANAGEMENT SYSTEM ===
+class Room {
+    +roomId: int
+    +hotelId: int
+    +roomNumber: string
+    +roomType: string
+    +description: string
+    +pricePerNight: float
+    +capacity: int
+    +isAvailable: bool
+}
+
+Hotel "1" -- "1..*" Room
+
+class Booking {
+    +bookingId: int
+    +guestId: int
+    +roomId: int
+    +checkIn: datetime
+    +checkOut: datetime
+    +totalPrice: float
+    +status: string
+}
+
+Room "1" -- "0..*" Booking
+GuestUser "1" -- "0..*" Booking
+
+class Payment {
+    +paymentId: int
+    +bookingId: int
+    +amount: float
+    +paymentMethod: string
+    +paymentStatus: string
+    +transactionDate: datetime
+}
+
+Booking "1" -- "1" Payment
+
+class Review {
+    +reviewId: int
+    +userId: int
+    +hotelId: int
+    +rating: int
+    +comment: string
+    +createdAt: datetime
+}
+
+User "1" -- "0..*" Review
+Hotel "1" -- "0..*" Review
+
+class Favorite {
+    +favoriteId: int
+    +userId: int
+    +hotelId: int
+}
+
+User "1" -- "0..*" Favorite
+
+' === SYSTEM COMPONENTS ===
+class RecommendationSystem {
+    +generateRecommendations(userId: int): List<Hotel>
+    +trackUserBehavior()
+}
+
+class SearchEngine {
+    +search(query: string): List<Hotel>
+    +filterByRating()
+}
+
+RecommendationSystem --> Hotel
+SearchEngine --> Hotel
+
+@enduml
+

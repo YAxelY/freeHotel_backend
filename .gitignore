@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.env
+venv/
+
+# Django
+*.log
+*.pot
+*.pyc
+media/
+staticfiles/
+
+# IDE
+.vscode/
+.idea/
+
+# Database
+*.dump
+*.psql
+
+# Node/React (for later)
+node_modules/
+npm-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
