@@ -280,3 +280,43 @@ python manage.py shell
 >>> from core.models import *
 >>> HotelOwner.objects.all()
 ```
+
+
+----------------------------------------------------------------------------
+-----------------------
+-----------------------
+
+sample django project
+
+```mermaid
+project-root/
+├── config/
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── core/
+│   ├── models.py
+│   ├── views.py
+│   ├── serializers.py
+│   ├── admin.py
+│   ├── tests.py
+│   └── urls.py
+├── manage.py
+└── requirements.txt
+```
+
+---
+component diagram
+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffcccc'}}}%%
+graph TD
+    A[Client] --> B[DRF API Endpoints]
+    B --> C[Views]
+    C --> D[Models]
+    C --> E[Serializers]
+    D --> F[(PostgreSQL)]
+    E --> A
+    G[Admin] --> D
+    H[Authentication] --> C
+```

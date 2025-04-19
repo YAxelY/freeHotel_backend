@@ -15,8 +15,9 @@ class UserManager(BaseUserManager):
             email = self.normalize_email(email)
         
         user = self.model(
-            username=username,
             email=email,
+            username=username,
+            
             **extra_fields
         )
         user.set_password(password)
@@ -27,8 +28,11 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        return self.create_user(email, password, **extra_fields)
-
+        return self.create_user(
+            email=email,  # Explicitly assign email
+            password=password,
+            **extra_fields
+        )
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(
         _('username'),
@@ -40,8 +44,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(
         _('email address'), 
         unique=True, 
-        blank=True,
-        null=True
+        blank=False,
+        null=False
     )
     is_hotel_owner = models.BooleanField(_('hotel owner status'), default=False)
     is_active = models.BooleanField(_('active'), default=True)
@@ -102,7 +106,7 @@ class Hotel(models.Model):
     location = models.CharField(max_length=255)
     description = models.TextField()
     rating = models.FloatField(default=0.0)
-    amenities = models.JSONField(default=list)
+    amenities = models.JSONField(default=list)  
     
 class Room(models.Model):
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)

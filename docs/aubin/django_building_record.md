@@ -363,3 +363,77 @@ add this list to settings
         'django.contrib.auth.backends.ModelBackend'
     ]
 
+# journal 13: serializers
+
+    from rest_framework import serializers
+    from django.contrib.auth import authenticate
+    from .models import User
+
+    class LoginSerializer(serializers.Serializer):
+        username_or_email = serializers.CharField()
+        password = serializers.CharField()
+
+        def validate(self, data):
+            user = authenticate(
+                username=data.get('username_or_email'),
+                password=data.get('password')
+            )
+            
+            if not user:
+                raise serializers.ValidationError("Invalid credentials")
+            
+            if not user.is_active:
+                raise serializers.ValidationError("Account disabled")
+                
+            return user
+
+    class UserSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = User
+            fields = ('id', 'username', 'email', 'is_hotel_owner')
+
+# journal 14 : views 
+    from django.shortcuts import render
+
+    from rest_framework.views import APIView
+    from rest_framework.response import Response
+    from rest_framework import status
+    from rest_framework.authtoken.models import Token
+    from .serializers import LoginSerializer, UserSerializer
+
+    class LoginView(APIView):
+        def post(self, request):
+            serializer = LoginSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = serializer.validated_data
+            
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({
+                'token': token.key,
+                'user': UserSerializer(user).data
+            })
+
+    class LogoutView(APIView):
+        def post(self, request):
+            request.user.auth_token.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+# journal 15: updates urls.py
+
+    from django.urls import path
+    from .views import LoginView, LogoutView
+
+    urlpatterns = [
+        path('login/', LoginView.as_view(), name='login'),
+        path('logout/', LogoutView.as_view(), name='logout'),
+    ]
+
+# journal 16: updates config.urls.py
+
+    from django.urls import include, path
+
+    urlpatterns = [
+        path('admin/', admin.site.urls),
+        path('api/', include('core.urls')),  
+    ]
+
+
