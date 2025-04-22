@@ -1,8 +1,6 @@
 from django.contrib import admin
-
-from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User
+from .models import User, HotelOwner
 
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
@@ -30,5 +28,10 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('email', 'username')
     ordering = ('-created_at',)
     readonly_fields = ('last_login', 'created_at')
+
+@admin.register(HotelOwner)
+class HotelOwnerAdmin(admin.ModelAdmin):
+    list_display = ('user', 'business_name', 'contact_number')
+    search_fields = ('user__email', 'business_name')
 
 admin.site.register(User, CustomUserAdmin)

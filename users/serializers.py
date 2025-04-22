@@ -1,8 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import HotelOwner, User
-
-from .models import Hotel, Room
+from .models import User, HotelOwner
 
 class LoginSerializer(serializers.Serializer):
     username_or_email = serializers.CharField()
@@ -27,33 +25,9 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'is_hotel_owner')
         extra_kwargs = {
-            'username': {'read_only': True},  # Empêche la modification
+            'username': {'read_only': True},
             'email': {'required': True}
         }
-        
-
-
-
-class HotelSerializer(serializers.ModelSerializer):
-    owner = serializers.StringRelatedField(read_only=True)
-    
-    class Meta:
-        model = Hotel
-        fields = '__all__'
-        read_only_fields = ('owner', 'rating')
-
-class RoomSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Room
-        fields = '__all__'
-        read_only_fields = ('hotel',)
-        extra_kwargs = {
-            'room_number': {'required': False},
-            'room_type': {'required': False},
-            'capacity': {'required': False}
-        }
-        
-
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)

@@ -437,3 +437,9 @@ add this list to settings
     ]
 
 
+# journal 17 : re-structuring (for better maintenance)
+
+    python manage.py startapp users
+    python manage.py startapp hotels
+    python manage.py startapp search
+

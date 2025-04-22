@@ -3,6 +3,8 @@ from django_filters import rest_framework as filters
 from .models import Hotel
 
 class HotelFilter(filters.FilterSet):
+    amenities = filters.CharFilter(method='filter_amenities')
+
     class Meta:
         model = Hotel
         fields = {
@@ -11,14 +13,11 @@ class HotelFilter(filters.FilterSet):
             'rating': ['gte', 'lte'],
         }
         filter_overrides = {
-            # Correct JSONField reference
             models.JSONField: {
                 'filter_class': filters.CharFilter,
                 'extra': lambda f: {'lookup_expr': 'icontains'}
             }
         }
-    # In HotelFilter
-    amenities = filters.CharFilter(method='filter_amenities')
 
     def filter_amenities(self, queryset, name, value):
         return queryset.filter(amenities__contains=[value])

@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from .models import Hotel, Room
+from hotels.models import Hotel, Room  
 
 class IsHotelOwner(permissions.BasePermission):
     """Vérifie si l'utilisateur est le propriétaire de l'hôtel"""
