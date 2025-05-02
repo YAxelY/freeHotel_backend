@@ -4,7 +4,7 @@ from .models import User, HotelOwner
 
 class LoginSerializer(serializers.Serializer):
     username_or_email = serializers.CharField()
-    password = serializers.CharField()
+    password = serializers.CharField(write_only=True)
 
     def validate(self, data):
         user = authenticate(
@@ -26,24 +26,26 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'email', 'is_hotel_owner')
         extra_kwargs = {
             'username': {'read_only': True},
-            'email': {'required': True}
+            'email': {'required': True},
+            'is_hotel_owner': {'read_only': True}
         }
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, style={'input_type': 'password'})
     
     class Meta:
         model = User
-        fields = ('username', 'email', 'password', 'is_hotel_owner')
+        fields = ('username', 'email', 'password')
+        extra_kwargs = {
+            'email': {'required': True}
+        }
 
     def create(self, validated_data):
-        user = User.objects.create_user(
+        return User.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
-            password=validated_data['password'],
-            is_hotel_owner=validated_data.get('is_hotel_owner', False)
+            password=validated_data['password']
         )
-        return user
 
 class HotelOwnerSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)

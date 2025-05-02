@@ -6,9 +6,11 @@ from .views import (
     RoomDetailView
 )
 
+app_name = 'hotels'
+
 urlpatterns = [
-    path('hotels/', HotelListCreateView.as_view(), name='hotel-list'),
-    path('hotels/<int:pk>/', HotelDetailView.as_view(), name='hotel-detail'),
-    path('hotels/<int:hotel_id>/rooms/', RoomListCreateView.as_view(), name='room-list'),
-    path('hotels/<int:hotel_id>/rooms/<int:pk>/', RoomDetailView.as_view(), name='room-detail'),
+    path('', HotelListCreateView.as_view(), name='hotel-list'),
+    path('<int:pk>/', HotelDetailView.as_view(), name='hotel-detail'),
+    path('<int:hotel_id>/rooms/', RoomListCreateView.as_view(), name='room-list'),
+    path('<int:hotel_id>/rooms/<int:pk>/', RoomDetailView.as_view(), name='room-detail'),
 ]

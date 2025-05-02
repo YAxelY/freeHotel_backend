@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
-from ..models import User, HotelOwner
+from users.models import HotelOwner
 
 User = get_user_model()
 
@@ -16,7 +15,13 @@ class UserModelTests(TestCase):
         self.assertTrue(user.is_active)
         self.assertFalse(user.is_staff)
 
-    # Ajouter ici tous les autres tests User...
+    def test_create_superuser(self):
+        admin = User.objects.create_superuser(
+            email='admin@test.com',
+            password='adminpass'
+        )
+        self.assertTrue(admin.is_staff)
+        self.assertTrue(admin.is_superuser)
 
 class HotelOwnerModelTests(TestCase):
     def setUp(self):
@@ -34,3 +39,4 @@ class HotelOwnerModelTests(TestCase):
         )
         self.assertEqual(owner.user.email, 'owner@test.com')
         self.assertEqual(owner.business_name, "Luxury Stays")
+        self.assertEqual(str(owner), "Luxury Stays")

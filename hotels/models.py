@@ -13,10 +13,10 @@ from users.models import HotelOwner
 
 
 class Hotel(models.Model):
-    owner = models.ForeignKey(HotelOwner, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
-    location = models.CharField(max_length=255)
-    description = models.TextField()
+    owner = models.ForeignKey(HotelOwner, on_delete=models.CASCADE, related_name='hotels',null=False  )
+    name = models.CharField(max_length=255, default='Nouvel Hôtel')
+    location = models.CharField(max_length=255, default='Paris')
+    description = models.TextField(default='Description par défaut')
     rating = models.FloatField(default=0.0)
     amenities = models.JSONField(default=list)  
     

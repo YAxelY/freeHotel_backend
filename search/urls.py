@@ -1,8 +1,8 @@
-# search/urls.py
 from django.urls import path
-from . import views
+from .views import HotelSearchView
+
+app_name = 'search'
 
 urlpatterns = [
-    # Ajouter vos routes de recherche ici
-    # Exemple : path('hotels/', views.HotelSearchView.as_view()),
+    path('hotels/', HotelSearchView.as_view(), name='hotel-search'),
 ]

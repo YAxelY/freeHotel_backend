@@ -1,5 +1,6 @@
 # search/views.py
 from django_filters.rest_framework import FilterSet, CharFilter  # Import correct
+from hotels.serializers import HotelSerializer
 from rest_framework import generics
 from hotels.models import Hotel
 from django.contrib.postgres.search import SearchVector
@@ -14,4 +15,15 @@ class HotelSearchFilter(FilterSet):
 
 class HotelSearchView(generics.ListAPIView):
     queryset = Hotel.objects.all()
+    filterset_class = HotelSearchFilter
+
+from rest_framework import generics
+from django_filters.rest_framework import DjangoFilterBackend
+from hotels.models import Hotel
+from .filters import HotelSearchFilter
+
+class HotelSearchView(generics.ListAPIView):
+    queryset = Hotel.objects.all()
+    serializer_class = HotelSerializer  # À créer/adapter
+    filter_backends = [DjangoFilterBackend]
     filterset_class = HotelSearchFilter

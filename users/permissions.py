@@ -14,13 +14,13 @@ class IsHotelOwner(permissions.BasePermission):
         
         return False
     
+# permissions.py
 class CanManageHotel(permissions.BasePermission):
-    """Check if user can manage hotels"""
     def has_permission(self, request, view):
-        if request.method == 'POST':
-            return request.user.is_authenticated and request.user.is_hotel_owner
+        if view.action == 'create':
+            return request.user.is_hotel_owner
         return True
-    
+
 
 class IsSelfOrAdmin(permissions.BasePermission):
     """Allow users to edit their own profile"""
