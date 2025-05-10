@@ -27,3 +27,14 @@ class Room(models.Model):
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
     capacity = models.IntegerField()
     is_available = models.BooleanField(default=True)
+    
+    search_vector = models.JSONField(default=list, blank=True)
+    booking_count = models.IntegerField(default=0)
+    last_booking = models.DateTimeField(null=True, blank=True)
+    
+    def update_search_vector(self):
+        from recommendation.services import RecommendationEngine
+        engine = RecommendationEngine()
+        description = f"{self.room_type} {self.hotel.location} {self.hotel.description}"
+        self.search_vector = engine.generate_embeddings(description).tolist()
+        self.save()
