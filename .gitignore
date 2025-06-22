@@ -1,31 +1,62 @@
 # Python
-__pycache__/
+**/__pycache__/
+
 *.py[cod]
+*.so
+*.pyo
+*.pyd
 *.sqlite3
-*.env
+*.egg-info/
+dist/
+build/
 venv/
+ENV/
+env/
 
 # Django
 *.log
 *.pot
 *.pyc
 media/
+static/
 staticfiles/
+local_settings.py
+db.sqlite3
 
-# IDE
+# Migrations (si tu ne veux pas versionner les migrations au début)
+# Tu peux commenter ça si tu veux les garder
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# IDEs / éditeurs
 .vscode/
 .idea/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
 
-# Database
+# Node / React (si tu prévois du front dans le projet)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Dumps BDD
 *.dump
 *.psql
 
-# Node/React (for later)
-node_modules/
-npm-debug.log*
-
-# Environment files
+# Fichiers d'environnement
 .env
-.env.local
-.env.development
-.env.production
+.env.*
+!.env.example
+
+# Système
+.DS_Store
+Thumbs.db
+
+# Autres
+*.bak
+*.tmp
+*.orig
