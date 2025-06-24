@@ -13,12 +13,26 @@ from users.models import HotelOwner
 
 
 class Hotel(models.Model):
-    owner = models.ForeignKey(HotelOwner, on_delete=models.CASCADE, related_name='hotels',null=False  )
+    owner = models.ForeignKey(HotelOwner, on_delete=models.CASCADE, related_name='hotels', null=False)
     name = models.CharField(max_length=255, default='Nouvel Hôtel')
     location = models.CharField(max_length=255, default='Paris')
     description = models.TextField(default='Description par défaut')
     rating = models.FloatField(default=0.0)
-    amenities = models.JSONField(default=list)  
+    amenities = models.JSONField(default=list)
+
+    STATUS_CHOICES = [
+        ('incomplete', 'Incomplete'),
+        ('published', 'Published'),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='incomplete')
+    domain_name = models.CharField(max_length=255, blank=True, null=True)
+    seo_settings = models.JSONField(default=dict, blank=True)
+    logo_text = models.CharField(max_length=255, blank=True, null=True)
+    slogan = models.CharField(max_length=255, blank=True, null=True)
+    footer_email = models.CharField(max_length=255, blank=True, null=True)
+    footer_phone = models.CharField(max_length=50, blank=True, null=True)
+    template_data = models.JSONField(default=dict, blank=True)
+    published_at = models.DateTimeField(null=True, blank=True)
     
 class Room(models.Model):
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)

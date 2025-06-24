@@ -3,21 +3,22 @@ from django.contrib.auth import authenticate
 from .models import User, HotelOwner
 
 class LoginSerializer(serializers.Serializer):
-    username_or_email = serializers.CharField()
+    email = serializers.CharField(required=False)
+    username = serializers.CharField(required=False)
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
+        identifier = data.get('email') or data.get('username')
+        if not identifier or not data.get('password'):
+            raise serializers.ValidationError("Email/Username and password are required")
         user = authenticate(
-            username=data.get('username_or_email'),
+            username=identifier,
             password=data.get('password')
         )
-        
         if not user:
             raise serializers.ValidationError("Invalid credentials")
-        
         if not user.is_active:
             raise serializers.ValidationError("Account disabled")
-            
         return user
 
 class UserSerializer(serializers.ModelSerializer):

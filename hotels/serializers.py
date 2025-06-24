@@ -7,7 +7,8 @@ class HotelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hotel
         fields = '__all__'
-        read_only_fields = ('owner', 'rating')
+        # Only owner, rating, and published_at are read-only; all other fields are writable
+        read_only_fields = ('owner', 'rating', 'published_at')
 
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:

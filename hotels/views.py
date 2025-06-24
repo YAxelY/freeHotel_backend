@@ -6,6 +6,10 @@ from .serializers import HotelSerializer, RoomSerializer
 from .permissions import CanManageHotel, IsHotelOwner
 from rest_framework.exceptions import PermissionDenied
 from .filters import HotelFilter
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
+from django.utils import timezone
 
 class HotelListCreateView(generics.ListCreateAPIView):
     serializer_class = HotelSerializer
@@ -17,12 +21,11 @@ class HotelListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         queryset = Hotel.objects.all()
-        
+        # Filter by owner for dashboard
+        if self.request.user.is_authenticated and hasattr(self.request.user, 'hotelowner'):
+            queryset = queryset.filter(owner=self.request.user.hotelowner)
         if self.request.query_params.get('has_available_rooms') == 'true':
-            return queryset.filter(
-                rooms__is_available=True
-            ).distinct()
-            
+            return queryset.filter(rooms__is_available=True).distinct()
         return queryset
     
 
@@ -68,3 +71,33 @@ class RoomDetailView(generics.RetrieveUpdateDestroyAPIView):
             owner__user=self.request.user  # Critical security check
         )
         serializer.save(hotel=hotel)
+
+class PublishHotelView(APIView):
+    permission_classes = [IsHotelOwner]
+
+    def patch(self, request, pk):
+        hotel = get_object_or_404(Hotel, pk=pk)
+        self.check_object_permissions(request, hotel)
+        # Set status to published and set published_at
+        hotel.status = 'published'
+        hotel.published_at = timezone.now()
+        hotel.save()
+        serializer = HotelSerializer(hotel)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class PreviewHotelView(APIView):
+    permission_classes = [permissions.IsAuthenticated]  # Only owner can preview
+
+    def get(self, request, pk):
+        hotel = get_object_or_404(Hotel, pk=pk)
+        if hotel.owner != request.user.hotelowner:
+            return Response({'detail': 'Not allowed.'}, status=status.HTTP_403_FORBIDDEN)
+        serializer = HotelSerializer(hotel)
+        return Response(serializer.data)
+
+class PublicHotelListView(generics.ListAPIView):
+    serializer_class = HotelSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        return Hotel.objects.filter(status='published')
