@@ -14,6 +14,11 @@ class Reservation(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='reservations')
     check_in = models.DateField()
     check_out = models.DateField()
+    guests = models.PositiveIntegerField(default=1)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    client_name = models.CharField(max_length=100, blank=True, null=True)
+    client_email = models.EmailField(blank=True, null=True)
+    client_phone = models.CharField(max_length=30, blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     created_at = models.DateTimeField(auto_now_add=True)
 

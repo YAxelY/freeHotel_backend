@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from django.utils import timezone
+from django.db import transaction
 
 class HotelListCreateView(generics.ListCreateAPIView):
     serializer_class = HotelSerializer
@@ -40,6 +41,12 @@ class HotelDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = HotelSerializer
     permission_classes = [IsHotelOwner]
     lookup_field = 'pk'
+
+    def perform_update(self, serializer):
+        hotel = serializer.save()
+        # No more sync_rooms_from_template_data
+        # with transaction.atomic():
+        #     hotel.sync_rooms_from_template_data()
 
 class RoomListCreateView(generics.ListCreateAPIView):
     serializer_class = RoomSerializer
@@ -78,10 +85,11 @@ class PublishHotelView(APIView):
     def patch(self, request, pk):
         hotel = get_object_or_404(Hotel, pk=pk)
         self.check_object_permissions(request, hotel)
-        # Set status to published and set published_at
-        hotel.status = 'published'
-        hotel.published_at = timezone.now()
-        hotel.save()
+        with transaction.atomic():
+            hotel.status = 'published'
+            hotel.published_at = timezone.now()
+            hotel.save()
+            # No more sync_rooms_from_template_data
         serializer = HotelSerializer(hotel)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

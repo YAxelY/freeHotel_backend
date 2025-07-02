@@ -1,22 +1,40 @@
 from rest_framework import serializers
 from .models import Hotel, Room
 
+class RoomSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(required=False, allow_null=True)
+    hotel = serializers.SerializerMethodField(read_only=True)
+
+    def get_hotel(self, obj):
+        if obj.hotel:
+            return {
+                'id': obj.hotel.id,
+                'name': obj.hotel.name,
+                'logo_text': obj.hotel.logo_text,
+            }
+        return None
+
+    class Meta:
+        model = Room
+        fields = [
+            'id', 'hotel', 'room_number', 'room_type', 'price_per_night',
+            'capacity', 'is_available', 'image', 'last_booking'
+        ]
+        read_only_fields = ('hotel',)
+        extra_kwargs = {
+            'room_number': {'required': True},
+            'room_type': {'required': False},
+            'capacity': {'required': True},
+            'is_available': {'required': False},
+            'image': {'required': False},
+        }
+
 class HotelSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField(read_only=True)
+    rooms = RoomSerializer(many=True, read_only=True)
     
     class Meta:
         model = Hotel
         fields = '__all__'
         # Only owner, rating, and published_at are read-only; all other fields are writable
         read_only_fields = ('owner', 'rating', 'published_at')
-
-class RoomSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Room
-        fields = '__all__'
-        read_only_fields = ('hotel',)
-        extra_kwargs = {
-            'room_number': {'required': False},
-            'room_type': {'required': False},
-            'capacity': {'required': False}
-        }
