@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Hotel, Room
+from .models import Hotel, Room, Review
+from users.models import User
 
 class RoomSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(required=False, allow_null=True)
@@ -38,3 +39,25 @@ class HotelSerializer(serializers.ModelSerializer):
         fields = '__all__'
         # Only owner, rating, and published_at are read-only; all other fields are writable
         read_only_fields = ('owner', 'rating', 'published_at')
+
+class ReviewSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
+    profile_photo = serializers.ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = Review
+        fields = ['id', 'user', 'username', 'email', 'profile_photo', 'stars', 'comment', 'created_at']
+        read_only_fields = ['id', 'user', 'username', 'email', 'created_at']
+
+    def get_username(self, obj):
+        return obj.user.username or ''
+
+    def get_email(self, obj):
+        return obj.user.email
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            validated_data['user'] = request.user
+        return super().create(validated_data)

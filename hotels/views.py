@@ -1,8 +1,8 @@
 from rest_framework import generics, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from .models import Hotel, Room
-from .serializers import HotelSerializer, RoomSerializer
+from .models import Hotel, Room, Review
+from .serializers import HotelSerializer, RoomSerializer, ReviewSerializer
 from .permissions import CanManageHotel, IsHotelOwner
 from rest_framework.exceptions import PermissionDenied
 from .filters import HotelFilter
@@ -11,6 +11,8 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 from django.utils import timezone
 from django.db import transaction
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.db.models import Avg, Count
 
 class HotelListCreateView(generics.ListCreateAPIView):
     serializer_class = HotelSerializer
@@ -109,3 +111,45 @@ class PublicHotelListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Hotel.objects.filter(status='published')
+
+class ReviewListCreateView(generics.ListCreateAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class ReviewDeleteView(generics.DestroyAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        review = self.get_object()
+        if review.user != request.user:
+            return Response({'detail': 'You can only delete your own review.'}, status=status.HTTP_403_FORBIDDEN)
+        return super().delete(request, *args, **kwargs)
+
+class ReviewStatsView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        from .models import Review
+        total = Review.objects.count()
+        avg = Review.objects.aggregate(avg=Avg('stars'))['avg'] or 0
+        # Per-star counts (1-5)
+        star_counts = Review.objects.values('stars').annotate(count=Count('id'))
+        star_dict = {i: 0 for i in range(1, 6)}
+        for entry in star_counts:
+            star_dict[entry['stars']] = entry['count']
+        return Response({
+            'average': round(avg, 2),
+            'total': total,
+            'stars': star_dict
+        })

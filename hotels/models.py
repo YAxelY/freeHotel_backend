@@ -8,6 +8,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.utils.translation import gettext_lazy as _
 
 from users.models import HotelOwner
+from users.models import User
 
 
 
@@ -54,3 +55,16 @@ class Room(models.Model):
         description = f"{self.room_type} {self.hotel.location} {self.hotel.description}"
         self.search_vector = engine.generate_embeddings(description).tolist()
         self.save()
+
+class Review(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+    profile_photo = models.ImageField(upload_to='review_profiles/', blank=True, null=True)
+    stars = models.PositiveSmallIntegerField(default=0)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Review by {self.user.email} - {self.stars} stars"
