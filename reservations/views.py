@@ -30,7 +30,14 @@ class ReservationDetailView(generics.RetrieveDestroyAPIView):
     queryset = Reservation.objects.all()
 
     def get_queryset(self):
-        return Reservation.objects.filter(user=self.request.user)
+        user = self.request.user
+        # Hotel owner or admin: can delete any reservation for their hotels
+        if hasattr(user, 'hotelowner') or user.is_staff or user.is_superuser:
+            from hotels.models import Hotel
+            hotel_ids = Hotel.objects.filter(owner=user.hotelowner).values_list('id', flat=True)
+            return Reservation.objects.filter(room__hotel_id__in=hotel_ids).select_related('room')
+        # Regular client: only their own reservations
+        return Reservation.objects.filter(user=user).select_related('room')
     
     
 
