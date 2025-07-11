@@ -1,0 +1,87 @@
+@startuml
+left to right direction
+
+' === USERS & ROLES ===
+package "Users & Roles" {
+  class User {
+      +id: int
+      +username: string
+      +email: string
+      +is_hotel_owner: bool
+      +is_active: bool
+      +is_staff: bool
+      +created_at: datetime
+      +groups: Group[]
+      +user_permissions: Permission[]
+  }
+  class HotelOwner {
+      +user: User (OneToOne)
+      +business_name: string
+      +contact_number: string
+  }
+  User <|-- HotelOwner
+}
+
+' === HOTEL MANAGEMENT ===
+package "Hotel Management" {
+  class Hotel {
+      +id: int
+      +owner: HotelOwner (FK)
+      +name: string
+      +location: string
+      +description: string
+      +rating: float
+      +amenities: JSON
+      +status: string
+      +domain_name: string
+      +seo_settings: JSON
+      +logo_text: string
+      +slogan: string
+      +footer_email: string
+      +footer_phone: string
+      +template_data: JSON
+      +published_at: datetime
+  }
+  class Room {
+      +id: int
+      +hotel: Hotel (FK)
+      +room_number: string
+      +room_type: string
+      +price_per_night: decimal
+      +capacity: int
+      +is_available: bool
+      +image: image
+      +last_booking: datetime
+  }
+  HotelOwner "1" -- "*" Hotel
+  Hotel "1" -- "*" Room
+}
+
+' === RESERVATIONS ===
+package "Reservations" {
+  class Reservation {
+      +id: int
+      +user: User (FK)
+      +room: Room (FK)
+      +check_in: date
+      +check_out: date
+      +guests: int
+      +price: decimal
+      +client_name: string
+      +client_email: string
+      +client_phone: string
+      +status: string
+      +created_at: datetime
+  }
+  User "1" -- "*" Reservation
+  Room "1" -- "*" Reservation
+}
+
+' === PERMISSIONS & FILTERS ===
+package "Permissions & Filters" {
+  class IsHotelOwner
+  class CanManageHotel
+  class HotelFilter
+}
+
+@enduml 

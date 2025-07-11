@@ -1,0 +1,66 @@
+@startuml
+actor "Hotel Owner" as Owner
+actor User
+participant "Frontend (React)" as FE
+participant "Backend API (Django)" as BE
+participant Database
+participant "Public Website"
+
+' Choose Template
+Owner -> FE: Click 'Create Website'
+FE -> BE: GET /api/templates
+BE -> Database: Fetch templates
+Database --> BE: Templates list
+BE --> FE: Templates data
+FE --> Owner: Show template options
+Owner -> FE: Select template
+FE -> BE: POST /api/hotels (template info)
+BE -> Database: Create Hotel (status=incomplete)
+Database --> BE: Hotel created
+BE --> FE: Hotel object
+
+' Customize Website
+Owner -> FE: Edit content, upload logo, set colors, etc.
+FE -> BE: PATCH /api/hotels/{id} (customization data)
+BE -> Database: Update Hotel
+Database --> BE: Hotel updated
+BE --> FE: Success
+
+' Save Progress
+Owner -> FE: Click 'Save'
+FE -> BE: PATCH /api/hotels/{id} (save data)
+BE -> Database: Save changes
+Database --> BE: Saved
+BE --> FE: Success
+
+' Publish Website
+Owner -> FE: Click 'Publish'
+FE -> BE: PATCH /api/hotels/{id}/publish
+BE -> Database: Set status='published', set published_at
+Database --> BE: Hotel published
+BE --> FE: Success
+
+' Preview/Edit Website
+Owner -> FE: Click 'Preview' or 'Edit'
+FE -> BE: GET /api/hotels/{id}
+BE -> Database: Fetch Hotel
+Database --> BE: Hotel data
+BE --> FE: Hotel data
+FE --> Owner: Show preview/editor
+
+' Display on Home Page
+FE -> BE: GET /api/hotels?status=published
+BE -> Database: Fetch published hotels
+Database --> BE: List
+BE --> FE: Hotel list
+FE --> User: Show on homepage
+
+' View Website (public or from rooms.jsx)
+User -> FE: Click "View Website" or link
+FE -> Public Website: Open hotel domain/page
+Public Website -> BE: GET /api/hotels/{id} (public endpoint)
+BE -> Database: Fetch Hotel
+Database --> BE: Hotel data
+BE --> Public Website: Hotel data
+Public Website --> User: Render hotel website
+@enduml 

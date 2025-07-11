@@ -1,0 +1,54 @@
+@startuml
+left to right direction
+
+' === PUBLISHED HOTEL ===
+package "Published Hotel" {
+  class Hotel {
+      +id: int
+      +name: string
+      +location: string
+      +description: string
+      +rating: float
+      +amenities: JSON
+      +status: string = 'published'
+      +domain_name: string
+      +seo_settings: JSON
+      +logo_text: string
+      +slogan: string
+      +footer_email: string
+      +footer_phone: string
+      +template_data: JSON
+      +published_at: datetime
+  }
+  class Room {
+      +id: int
+      +hotel: Hotel (FK)
+      +room_number: string
+      +room_type: string
+      +price_per_night: decimal
+      +capacity: int
+      +is_available: bool
+      +image: image
+      +last_booking: datetime
+  }
+  Hotel "1" -- "*" Room
+}
+
+package "Reservations" {
+  class Reservation {
+      +id: int
+      +room: Room (FK)
+      +check_in: date
+      +check_out: date
+      +guests: int
+      +price: decimal
+      +client_name: string
+      +client_email: string
+      +client_phone: string
+      +status: string
+      +created_at: datetime
+  }
+  Room "1" -- "*" Reservation
+}
+
+@enduml 

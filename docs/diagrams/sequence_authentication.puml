@@ -1,0 +1,22 @@
+@startuml
+actor User
+participant "Frontend (React)" as FE
+participant "Backend API (Django)" as BE
+participant Database
+
+== Sign Up ==
+User -> FE: Fill sign up form (email, username, password)
+FE -> BE: POST /api/users/register (form data)
+BE -> Database: Create User
+Database --> BE: User created
+BE --> FE: 201 Created / Success response
+FE --> User: Show success / redirect to login
+
+== Login ==
+User -> FE: Fill login form (email/username, password)
+FE -> BE: POST /api/users/login (credentials)
+BE -> Database: Validate credentials
+Database --> BE: User found/valid?
+BE --> FE: 200 OK + Auth token (or error)
+FE --> User: Store token, redirect to dashboard (or show error)
+@enduml 

@@ -1,0 +1,33 @@
+@startuml
+left to right direction
+
+actor Guest
+actor "Registered User" as User
+actor "Hotel Owner" as Owner
+actor Admin
+
+rectangle FreeHotel {
+  User -- (Register)
+  User -- (Login)
+  Guest -- (Search Hotels)
+  User -- (Search Hotels)
+  Guest -- (View Hotel Details)
+  User -- (View Hotel Details)
+  Guest -- (Book Room)
+  User -- (Book Room)
+  User -- (Manage Profile)
+  Owner -- (Manage Hotels)
+  Owner -- (Manage Rooms)
+  Owner -- (View Reservations)
+  Owner -- (Publish Hotel Website)
+  User -- (View Reservations)
+  Admin -- (Manage Users)
+  Admin -- (Manage Hotels)
+  Admin -- (View Analytics)
+}
+
+(Manage Hotels) .> (Manage Rooms) : includes
+(Manage Hotels) .> (Publish Hotel Website) : includes
+(Book Room) .> (View Hotel Details) : includes
+
+@enduml 

@@ -1,0 +1,23 @@
+@startuml
+left to right direction
+
+actor Visitor
+actor "Hotel Owner" as Owner
+
+rectangle "Published Hotel Website" {
+  Visitor -- (View Hotel Website)
+  Visitor -- (View Rooms)
+  Visitor -- (Book Room)
+  Visitor -- (Leave Review)
+  Visitor -- (Contact Hotel)
+  Owner -- (View Reservations)
+  Owner -- (Manage Hotel Content)
+  Owner -- (View Analytics)
+}
+
+(View Hotel Website) .> (View Rooms) : includes
+(View Hotel Website) .> (Book Room) : includes
+(View Hotel Website) .> (Leave Review) : includes
+(View Hotel Website) .> (Contact Hotel) : includes
+
+@enduml 

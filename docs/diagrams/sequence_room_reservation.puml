@@ -1,0 +1,42 @@
+@startuml
+actor "Guest/User" as User
+participant "Frontend (React/Public Website)" as FE
+participant "Backend API (Django)" as BE
+participant Database
+participant "Email/Notification" as Notify
+
+== Search & Select Room ==
+User -> FE: Search hotels/rooms
+FE -> BE: GET /api/hotels or /api/rooms
+BE -> Database: Fetch hotels/rooms
+Database --> BE: Data
+BE --> FE: Data
+FE --> User: Show results
+User -> FE: Select room, fill reservation form
+
+== Submit Reservation ==
+FE -> BE: POST /api/reservations (room, dates, info)
+BE -> Database: Check room availability
+Database --> BE: Available?
+alt Available
+  BE -> Database: Create Reservation
+  Database --> BE: Reservation saved
+  BE -> Notify: Send confirmation (email/notification)
+  Notify --> User: Confirmation
+  BE --> FE: Success (reservation details)
+  FE --> User: Show confirmation
+else Not available
+  BE --> FE: Error (room not available)
+  FE --> User: Show error
+end
+
+== On Published Hotel ==
+User -> FE: Visit hotel website, select room
+FE -> BE: POST /api/reservations (public endpoint)
+BE -> Database: Check & create reservation (same as above)
+Database --> BE: Reservation saved
+BE -> Notify: Send confirmation
+Notify --> User: Confirmation
+BE --> FE: Success
+FE --> User: Show confirmation
+@enduml 
