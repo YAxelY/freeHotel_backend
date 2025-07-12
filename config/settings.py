@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'search.apps.SearchConfig',
     'reservations.apps.ReservationsConfig',
     'recommendation.apps.RecommendationConfig',
+    'payment.apps.PaymentConfig',
 ]
 
 MIDDLEWARE = [
@@ -151,3 +152,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+# Sandbox Stripe Keys
+STRIPE_PUBLIC_KEY =os.getenv("STRIPE_PUBLIC_KEY").strip()
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY").strip() 
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET").strip()
+
