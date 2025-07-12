@@ -12,6 +12,12 @@ class RoomSerializer(serializers.ModelSerializer):
                 'id': obj.hotel.id,
                 'name': obj.hotel.name,
                 'logo_text': obj.hotel.logo_text,
+                'location': obj.hotel.location,
+                'rating': obj.hotel.rating,
+                'template_data': obj.hotel.template_data,
+                'status': obj.hotel.status,
+                'description': obj.hotel.description,
+                'amenities': obj.hotel.amenities,
             }
         return None
 
@@ -32,13 +38,20 @@ class RoomSerializer(serializers.ModelSerializer):
 
 class HotelSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField(read_only=True)
+    owner_email = serializers.SerializerMethodField(read_only=True)
     rooms = RoomSerializer(many=True, read_only=True)
+
+    def get_owner_email(self, obj):
+        # obj.owner is a HotelOwner instance, which has a .user (User) with .email
+        if obj.owner and hasattr(obj.owner, 'user') and obj.owner.user:
+            return obj.owner.user.email
+        return None
     
     class Meta:
         model = Hotel
         fields = '__all__'
-        # Only owner, rating, and published_at are read-only; all other fields are writable
-        read_only_fields = ('owner', 'rating', 'published_at')
+        extra_fields = ['owner_email']
+        read_only_fields = ('owner', 'owner_email', 'rating', 'published_at')
 
 class ReviewSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()

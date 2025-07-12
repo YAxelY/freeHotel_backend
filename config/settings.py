@@ -36,10 +36,10 @@ INSTALLED_APPS = [
     
     # Apps métier
     'users.apps.UsersConfig',
-
     'hotels.apps.HotelsConfig',
     'search.apps.SearchConfig',
     'reservations.apps.ReservationsConfig',
+    'recommendation.apps.RecommendationConfig',
 ]
 
 MIDDLEWARE = [
@@ -151,11 +151,3 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-
-
-# Ajouter en bas du fichier
-RECOMMENDATION_SETTINGS = {
-    'MODEL_PATH': 'bert-base-multilingual-cased',
-    'MIN_SIMILARITY': 0.4,
-    'MAX_RECOMMENDATIONS': 5
-}

@@ -48,13 +48,6 @@ class Room(models.Model):
     image = models.ImageField(upload_to='room_images/', blank=True, null=True, help_text='Room image file')
     # search_vector = models.JSONField(default=list, blank=True)  # We'll handle this later
     last_booking = models.DateTimeField(null=True, blank=True, help_text='Date of last reservation for this room')
-    
-    def update_search_vector(self):
-        from recommendation.services import RecommendationEngine
-        engine = RecommendationEngine()
-        description = f"{self.room_type} {self.hotel.location} {self.hotel.description}"
-        self.search_vector = engine.generate_embeddings(description).tolist()
-        self.save()
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
