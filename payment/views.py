@@ -25,10 +25,10 @@ class PlanPaymentView(APIView):
     def post(self, request):
         # Expected: hotel_id, plan_id, stripe_token, (user from request)
         hotel_id = request.data.get('hotel_id')
-        plan_id = request.data.get('plan_id')
+        plan_name = request.data.get('plan_name')
         stripe_token = request.data.get('stripe_token')
         hotel = get_object_or_404(Hotel, id=hotel_id)
-        plan = get_object_or_404(Plan, id=plan_id)
+        plan = get_object_or_404(Plan, name=plan_name)
         user = request.user
         # Stripe payment logic would go here (stubbed)
         # Assume payment is successful for now
