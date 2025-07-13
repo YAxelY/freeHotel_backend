@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Hotel, Room, Review
 from users.models import User
+from payment.models import HotelSubscription
 
 class RoomSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(required=False, allow_null=True)
@@ -40,17 +41,28 @@ class HotelSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField(read_only=True)
     owner_email = serializers.SerializerMethodField(read_only=True)
     rooms = RoomSerializer(many=True, read_only=True)
+    current_plan = serializers.SerializerMethodField(read_only=True)
 
     def get_owner_email(self, obj):
         # obj.owner is a HotelOwner instance, which has a .user (User) with .email
         if obj.owner and hasattr(obj.owner, 'user') and obj.owner.user:
             return obj.owner.user.email
         return None
-    
+
+    def get_current_plan(self, obj):
+        sub = HotelSubscription.objects.filter(hotel=obj, is_active=True).order_by('-start_date').first()
+        if sub:
+            return {
+                'name': sub.plan.name,
+                'description': sub.plan.description,
+                'price': str(sub.plan.price)
+            }
+        return None
+
     class Meta:
         model = Hotel
         fields = '__all__'
-        extra_fields = ['owner_email']
+        extra_fields = ['owner_email', 'current_plan']
         read_only_fields = ('owner', 'owner_email', 'rating', 'published_at')
 
 class ReviewSerializer(serializers.ModelSerializer):
